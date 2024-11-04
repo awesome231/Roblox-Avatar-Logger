@@ -1,4 +1,4 @@
-**ROBLOX ACCESSORY SNIPER**
+**ROBLOX AVATAR LOGGER**
 
 Instructions:
 
