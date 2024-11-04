@@ -42,7 +42,7 @@ while True:
         oldwear = active
         print("defaulting to new outfit")
         checkwearing = 1
-        time.sleep(3)
+        time.sleep(timeperrequest)
     elif checkwearing == 1:
         if oldwear != active:
             print(f"{name} has changed their outfit: ids = {active}")
@@ -64,7 +64,7 @@ while True:
                 response = webhook.execute()
                 print("loss is null")
             checkwearing = 0
-            time.sleep(3)
+            time.sleep(timeperrequest)
         else:
             print("outfit is the same")
-            time.sleep(3)
+            time.sleep(timeperrequest)
