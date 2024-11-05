@@ -2,16 +2,19 @@ import requests
 import time
 from discord_webhook import DiscordWebhook
 
-user_id =  # set target's user id here
-timeperrequest = 4 # change each time it sends a request (2 requests are sent during the duration)
-Webhook = # enter your discord webhook DO NOT SHARE
+user_id = #set target's userid here
+timeperrequest = 5 # edit time per request
+Webhook = "" # DO NOT SHARE, enter your webhook
 
-cookie = "" # enter your FULL ROBLOX COOKIE, NOT JUST ROBLOSECURITY. DO. NOT. SHARE. THIS.
+cookie = "" # DO NOT SHARE, your FULL roblox cookie, not just ROBLOSECURITY!!
 
 checkwearing = 0
 outfitchanged = 0
+getuser = 0
 first = 0
 oldwear = []
+
+
 
 headers = {
     'cookie': cookie
@@ -19,15 +22,15 @@ headers = {
 
 while True:
     data = requests.get(f"https://avatar.roblox.com/v1/users/{user_id}/currently-wearing", headers=headers)
-    user = requests.get(f"https://users.roblox.com/v1/users/{user_id}", headers=headers)
+    if getuser == 0:
+        user = requests.get(f"https://users.roblox.com/v1/users/{user_id}", headers=headers)
+        user = user.json()
+        name = user.get("name", [])
     status1 = data.status_code
-    status2 = user.status_code
-    print(f"Status Code: Currently wearing: {status1} UserID: {status2}")
+    print(f"Status Code: {status1}")
     data = data.json()
-    user = user.json()
 
     active = data.get("assetIds", [])
-    name = user.get("name", [])
     length = len(active)
     print(f"amount of assets wearing: {length}")
     if first == 0 and active != []:
