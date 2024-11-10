@@ -14,17 +14,41 @@ getuser = 0
 first = 0
 oldwear = []
 
-embed = DiscordEmbed()
 
+retries = 0
+
+embed = DiscordEmbed()
 
 
 headers = {
     'cookie': cookie
 }
 
+
+def loadbodyshot():
+    global retries
+    while True:
+        headshot = requests.get(f"https://thumbnails.roblox.com/v1/users/avatar?userIds={user_id}&size=420x420&format=Png&isCircular=false")
+        headshot = headshot.json()
+        headshoturl = headshot.get("data", {})
+        headshoturl2 = headshoturl[0].get("imageUrl")
+        if headshoturl2:
+            embed.set_image(url=headshoturl2)
+            print("sucess")
+            break
+        else:
+            if retries == 5:
+                embed.set_image(url='https://static.wikia.nocookie.net/roblox/images/6/66/Content_Deleted.png/revision/latest/scale-to-width-down/250?cb=20230428000418')
+                retries = 0
+                break
+            print("retrying")
+            retries += 1
+            time.sleep(1)
+
+
+
 while True:
     data = requests.get(f"https://avatar.roblox.com/v1/users/{user_id}/currently-wearing", headers=headers)
-    headshot = requests.get(f"https://thumbnails.roblox.com/v1/users/avatar?userIds={user_id}&size=420x420&format=Png&isCircular=false")
     if getuser == 0:
         user = requests.get(f"https://users.roblox.com/v1/users/{user_id}", headers=headers)
         user = user.json()
@@ -32,10 +56,8 @@ while True:
     status1 = data.status_code
     print(f"Status Code: {status1}")
     data = data.json()
-    headshot = headshot.json()
-    headshoturl = headshot.get("data", {})
-    headshoturl2 = headshoturl[0].get("imageUrl")
-    
+
+    print("breaked")
 
     active = data.get("assetIds", [])
     length = len(active)
@@ -43,20 +65,14 @@ while True:
     if first == 0 and active != []:
         oldwear = active
         webhook = DiscordWebhook(url=Webhook, content=f"Targetting **{name}** :dart:\nTheir current avatar consists of {active}")
-        if headshoturl2:
-            embed.set_image(url=headshoturl2)
-        else:
-            embed.set_image(url='https://static.wikia.nocookie.net/roblox/images/6/66/Content_Deleted.png/revision/latest/scale-to-width-down/250?cb=20230428000418')
+        loadbodyshot()
         webhook.add_embed(embed)
         response = webhook.execute()
         first = 1
     elif first == 0 and active == []:
         webhook = DiscordWebhook(url=Webhook, content=f"Targetting **{name}**:dart:\nTheir current avatar is **Blank!**")
-        if headshoturl2:
-            embed.set_image(url=headshoturl2)
-        else:
-            embed.set_image(url='https://static.wikia.nocookie.net/roblox/images/6/66/Content_Deleted.png/revision/latest/scale-to-width-down/250?cb=20230428000418')
         oldwear = active
+        loadbodyshot()
         webhook.add_embed(embed)
         response = webhook.execute()
         first = 1
@@ -69,46 +85,34 @@ while True:
             lossed = set(oldwear) - set(active)
             if active == []:
                 webhook = DiscordWebhook(url=Webhook, content=f"**{name}** has changed their outfit! \nbut they set it so a **Blank Avatar** \n**Removed**: {lossed}")
-                if headshoturl2:
-                    embed.set_image(url=headshoturl2)
-                else:
-                    embed.set_image(url='https://static.wikia.nocookie.net/roblox/images/6/66/Content_Deleted.png/revision/latest/scale-to-width-down/250?cb=20230428000418')
+                oldwear = active
+                loadbodyshot()
                 webhook.add_embed(embed)
                 response = webhook.execute()
-                oldwear = active
                 time.sleep(timeperrequest)
             elif added and lossed:
                 webhook = DiscordWebhook(url=Webhook, content=f"**{name}** has changed their outfit!: \n**Wearing**: = {active} \n**Added**: {added} \n**Removed**: {lossed}")
-                if headshoturl2:
-                    embed.set_image(url=headshoturl2)
-                else:
-                    embed.set_image(url='https://static.wikia.nocookie.net/roblox/images/6/66/Content_Deleted.png/revision/latest/scale-to-width-down/250?cb=20230428000418')
+                oldwear = active
+                loadbodyshot()
                 webhook.add_embed(embed)
                 response = webhook.execute()
                 print("none is null")
-                oldwear = active
                 time.sleep(timeperrequest)
             elif lossed:
                 webhook = DiscordWebhook(url=Webhook, content=f"**{name}** has changed their outfit!: \n**Wearing**: = {active} \n**Nothing Added** \n**Removed**: {lossed}")
-                if headshoturl2:
-                    embed.set_image(url=headshoturl2)
-                else:
-                    embed.set_image(url='https://static.wikia.nocookie.net/roblox/images/6/66/Content_Deleted.png/revision/latest/scale-to-width-down/250?cb=20230428000418')
+                oldwear = active
+                loadbodyshot()
                 webhook.add_embed(embed)
                 response = webhook.execute()
                 print("added is null")
-                oldwear = active
                 time.sleep(timeperrequest)
             elif added:
                 webhook = DiscordWebhook(url=Webhook, content=f"**{name}** has changed their outfit!: \n**Wearing**: = {active} \n**Added**: {added} \n**Nothing Removed**")
-                if headshoturl2:
-                    embed.set_image(url=headshoturl2)
-                else:
-                    embed.set_image(url='https://static.wikia.nocookie.net/roblox/images/6/66/Content_Deleted.png/revision/latest/scale-to-width-down/250?cb=20230428000418')
+                oldwear = active
+                loadbodyshot()
                 webhook.add_embed(embed)
                 response = webhook.execute()
                 print("loss is null")
-                oldwear = active
                 time.sleep(timeperrequest)
             checkwearing = 0
         else:
